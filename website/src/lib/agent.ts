@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // Types matching the mock-data structure
 export type Post = {
@@ -80,7 +81,24 @@ export type AgentDb = {
   };
 };
 
-const DB_FILE = path.resolve('db.json');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const DB_FILE = path.resolve(__dirname, '../../db.json');
+
+function getPaths() {
+  const localWorkspaceMeta = path.resolve(__dirname, '../../../workspace-019fe02f-8906-7b00-a122-09a1ded60640/app/data/agent_meta.json');
+  const localWorkspaceMemory = path.resolve(__dirname, '../../../workspace-019fe02f-8906-7b00-a122-09a1ded60640/app/data/memory.json');
+  
+  if (fs.existsSync(localWorkspaceMeta) && fs.existsSync(localWorkspaceMemory)) {
+    return { metaPath: localWorkspaceMeta, memoryPath: localWorkspaceMemory };
+  }
+  
+  const bundledMeta = path.resolve(__dirname, '../../data/agent_meta.json');
+  const bundledMemory = path.resolve(__dirname, '../../data/memory.json');
+  
+  return { metaPath: bundledMeta, memoryPath: bundledMemory };
+}
 
 // Mutex-like sync lock to avoid file corruption
 let isWriting = false;
@@ -117,8 +135,7 @@ function extractTitle(text: string): string {
 
 function importPythonAgentData(): AgentDb | null {
   try {
-    const metaPath = path.resolve(process.cwd(), '../workspace-019fe02f-8906-7b00-a122-09a1ded60640/app/data/agent_meta.json');
-    const memoryPath = path.resolve(process.cwd(), '../workspace-019fe02f-8906-7b00-a122-09a1ded60640/app/data/memory.json');
+    const { metaPath, memoryPath } = getPaths();
 
     if (!fs.existsSync(metaPath) || !fs.existsSync(memoryPath)) {
       return null;
@@ -249,7 +266,7 @@ export function readDb(): AgentDb {
 
 function saveToPythonMeta(persona: { name: string, domain: string }, agentId: string | null): void {
   try {
-    const metaPath = path.resolve(process.cwd(), '../workspace-019fe02f-8906-7b00-a122-09a1ded60640/app/data/agent_meta.json');
+    const { metaPath } = getPaths();
     if (!fs.existsSync(metaPath)) return;
 
     const data = {
@@ -268,7 +285,7 @@ function saveToPythonMeta(persona: { name: string, domain: string }, agentId: st
 
 function saveToPythonMemory(dbPosts: Post[]): void {
   try {
-    const memoryPath = path.resolve(process.cwd(), '../workspace-019fe02f-8906-7b00-a122-09a1ded60640/app/data/memory.json');
+    const { memoryPath } = getPaths();
     if (!fs.existsSync(memoryPath)) return;
 
     // Map to python post structure
