@@ -1,4 +1,3 @@
 {
-  "buildCommand": "cd website && npm install && npm run build",
-  "outputDirectory": "website/.vercel/output"
+  "buildCommand": "cd website && npm install && npm run build && mv .vercel/output ../"
 }
