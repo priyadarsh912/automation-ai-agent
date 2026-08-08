@@ -117,8 +117,8 @@ function extractTitle(text: string): string {
 
 function importPythonAgentData(): AgentDb | null {
   try {
-    const metaPath = "c:/Users/spriy/Downloads/media agent/workspace-019fe02f-8906-7b00-a122-09a1ded60640/app/data/agent_meta.json";
-    const memoryPath = "c:/Users/spriy/Downloads/media agent/workspace-019fe02f-8906-7b00-a122-09a1ded60640/app/data/memory.json";
+    const metaPath = path.resolve(process.cwd(), '../workspace-019fe02f-8906-7b00-a122-09a1ded60640/app/data/agent_meta.json');
+    const memoryPath = path.resolve(process.cwd(), '../workspace-019fe02f-8906-7b00-a122-09a1ded60640/app/data/memory.json');
 
     if (!fs.existsSync(metaPath) || !fs.existsSync(memoryPath)) {
       return null;
@@ -249,7 +249,7 @@ export function readDb(): AgentDb {
 
 function saveToPythonMeta(persona: { name: string, domain: string }, agentId: string | null): void {
   try {
-    const metaPath = "c:/Users/spriy/Downloads/media agent/workspace-019fe02f-8906-7b00-a122-09a1ded60640/app/data/agent_meta.json";
+    const metaPath = path.resolve(process.cwd(), '../workspace-019fe02f-8906-7b00-a122-09a1ded60640/app/data/agent_meta.json');
     if (!fs.existsSync(metaPath)) return;
 
     const data = {
@@ -268,7 +268,7 @@ function saveToPythonMeta(persona: { name: string, domain: string }, agentId: st
 
 function saveToPythonMemory(dbPosts: Post[]): void {
   try {
-    const memoryPath = "c:/Users/spriy/Downloads/media agent/workspace-019fe02f-8906-7b00-a122-09a1ded60640/app/data/memory.json";
+    const memoryPath = path.resolve(process.cwd(), '../workspace-019fe02f-8906-7b00-a122-09a1ded60640/app/data/memory.json');
     if (!fs.existsSync(memoryPath)) return;
 
     // Map to python post structure
