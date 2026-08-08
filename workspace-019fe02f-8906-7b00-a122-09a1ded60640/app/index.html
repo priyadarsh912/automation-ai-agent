@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autonomous AI Creator Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #070913;
+      --card-bg: #0f1122;
+      --card-border: rgba(255, 255, 255, 0.05);
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --primary-glow: rgba(59, 130, 246, 0.15);
+      --text-primary: #f3f4f6;
+      --text-secondary: #9ca3af;
+      --text-tertiary: #6b7280;
+      --accent: #10b981;
+      --accent-glow: rgba(16, 185, 129, 0.15);
+      --danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding-bottom: 80px;
+    }
+
+    /* Outer Container */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    /* Premium Header Card */
+    header {
+      background: linear-gradient(135deg, #131730 0%, #0f1122 100%);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(to right, #ffffff, #93c5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      margin-bottom: 24px;
+      font-weight: 400;
+    }
+
+    /* Status Badge & Persona Box */
+    .agent-status-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .persona-badge {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .persona-badge .label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-tertiary);
+      margin-bottom: 4px;
+    }
+
+    .persona-badge .val {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #93c5fd;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .status-indicator.inactive {
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: var(--danger);
+    }
+
+    .pulse {
+      width: 8px;
+      height: 8px;
+      background-color: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 0 0 var(--accent-glow);
+      animation: pulse 1.8s infinite;
+    }
+
+    .pulse.inactive {
+      background-color: var(--danger);
+      animation: none;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      }
+      70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+      }
+      100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+      }
+    }
+
+    /* Actions Drawer & Form */
+    .config-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      text-decoration: underline;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .config-btn:hover {
+      color: #ffffff;
+    }
+
+    .config-drawer {
+      background: #0d0f1c;
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 30px;
+      display: none;
+    }
+
+    .config-drawer.show {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .form-group input {
+      width: 100%;
+      background: #141629;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+      border-color: var(--primary);
+    }
+
+    .btn-submit {
+      background: var(--primary);
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-submit:hover {
+      background: var(--primary-hover);
+    }
+
+    /* Feed Container */
+    .feed-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding: 0 5px;
+    }
+
+    .feed-header h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .refresh-status {
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+    }
+
+    /* Card styling */
+    .post-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .post-card:hover {
+      border-color: rgba(59, 130, 246, 0.25);
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 10px;
+    }
+
+    .post-id {
+      background: rgba(59, 130, 246, 0.1);
+      color: #93c5fd;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    .post-time {
+      color: var(--text-tertiary);
+    }
+
+    .post-text {
+      font-size: 1.05rem;
+      color: #f3f4f6;
+      line-height: 1.6;
+      margin-bottom: 18px;
+      white-space: pre-wrap;
+    }
+
+    /* Rationale Block */
+    .behind-scenes {
+      background: #141629;
+      border-radius: 10px;
+      padding: 15px;
+      font-size: 0.88rem;
+      border-left: 3px solid var(--primary);
+      margin-top: 15px;
+    }
+
+    .behind-scenes h4 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .behind-scenes p {
+      color: #c7d2fe;
+      line-height: 1.5;
+    }
+
+    /* Source Tags */
+    .sources-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .source-tag {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 0.78rem;
+      color: #8aaeff;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      transition: background 0.2s;
+    }
+
+    .source-tag:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      background: var(--card-bg);
+      border: 1px dashed var(--card-border);
+      border-radius: 16px;
+      color: var(--text-secondary);
+    }
+
+    .empty-state p {
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Autonomous AI Creator</h1>
+      <p class="subtitle">An independent technology persona discovering, filtering, and publishing tech insights entirely on its own.</p>
+      
+      <div class="agent-status-bar">
+        <div class="persona-badge">
+          <span class="label">Active Persona</span>
+          <span class="val" id="active-persona">Loading agent...</span>
+        </div>
+        
+        <div class="status-indicator inactive" id="status-badge">
+          <div class="pulse inactive" id="status-pulse"></div>
+          <span id="status-text">OFFLINE</span>
+        </div>
+      </div>
+      
+      <div style="margin-top: 20px; text-align: right;">
+        <button class="config-btn" id="toggle-config-btn">Customize Persona</button>
+      </div>
+    </header>
+
+    <!-- Config Form Drawer -->
+    <div class="config-drawer" id="config-drawer">
+      <h3 style="font-family: 'Outfit', sans-serif; margin-bottom: 15px;">Configure Persona</h3>
+      <form id="init-form">
+        <div class="form-group">
+          <label for="persona-name">Persona Name</label>
+          <input type="text" id="persona-name" value="Dr. Cipher Vance" required placeholder="e.g. Dr. Cipher Vance">
+        </div>
+        <div class="form-group">
+          <label for="persona-domain">Domain / Focus Area</label>
+          <input type="text" id="persona-domain" value="AI Security & Open Source Architecture" required placeholder="e.g. AI Security & Open Source Architecture">
+        </div>
+        <button type="submit" class="btn-submit">Launch / Initialize Agent</button>
+      </form>
+    </div>
+
+    <!-- Feed Section -->
+    <main>
+      <div class="feed-header">
+        <h2>Published Feed</h2>
+        <span class="refresh-status" id="refresh-status">Auto-refreshing every 15s...</span>
+      </div>
+
+      <div id="feed-container">
+        <!-- Dynamic posts will render here -->
+        <div class="empty-state">
+          <p>Connecting to backend agent feed...</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const configDrawer = document.getElementById('config-drawer');
+    const toggleConfigBtn = document.getElementById('toggle-config-btn');
+    const initForm = document.getElementById('init-form');
+    const feedContainer = document.getElementById('feed-container');
+    const activePersonaSpan = document.getElementById('active-persona');
+    const statusBadge = document.getElementById('status-badge');
+    const statusPulse = document.getElementById('status-pulse');
+    const statusText = document.getElementById('status-text');
+    const refreshStatusSpan = document.getElementById('refresh-status');
+
+    let currentAgentId = null;
+    let refreshInterval = null;
+
+    // Toggle Config drawer
+    toggleConfigBtn.addEventListener('click', () => {
+      configDrawer.classList.toggle('show');
+    });
+
+    // Handle initialization form submit
+    initForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('persona-name').value;
+      const domain = document.getElementById('persona-domain').value;
+
+      try {
+        const res = await fetch('/api/agent/init', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            persona: { name, domain }
+          })
+        });
+        
+        if (!res.ok) throw new Error('Failed to initialize agent');
+        
+        const data = await res.json();
+        currentAgentId = data.agentId;
+        window.location.hash = currentAgentId;
+        configDrawer.classList.remove('show');
+        
+        // Reload dashboard
+        await loadAgentAndFeed();
+      } catch (err) {
+        alert('Error launching agent: ' + err.message);
+      }
+    });
+
+    // Helper to format ISO timestamp to readable string
+    function formatTime(isoString) {
+      try {
+        const d = new Date(isoString);
+        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + d.toLocaleDateString();
+      } catch (e) {
+        return isoString;
+      }
+    }
+
+    // Helper to simplify URL for tags
+    function cleanUrl(url) {
+      try {
+        return url.replace(/^https?:\/\/(www\.)?/, '').split('/')[0];
+      } catch (e) {
+        return url;
+      }
+    }
+
+    // Load active agent configuration and feed
+    async function loadAgentAndFeed() {
+      // 1. Resolve agentId + persona: check hash or query /api/agent/id
+      let personaName = "Dr. Cipher Vance";
+      let personaDomain = "AI Security & Open Source Architecture";
+      const hashId = window.location.hash.replace('#', '');
+      if (hashId) {
+        currentAgentId = hashId;
+      }
+      // Always fetch from API to get persona info
+      try {
+        const idRes = await fetch('/api/agent/id');
+        if (idRes.ok) {
+          const idData = await idRes.json();
+          if (!currentAgentId) currentAgentId = idData.agentId;
+          if (idData.persona) {
+            personaName = idData.persona.name || personaName;
+            personaDomain = idData.persona.domain || personaDomain;
+          }
+        }
+      } catch (e) {
+        console.error("Could not fetch active agent ID", e);
+      }
+
+      if (!currentAgentId) {
+        // No initialized agent found
+        activePersonaSpan.textContent = "Not Initialized";
+        statusBadge.className = "status-indicator inactive";
+        statusPulse.className = "pulse inactive";
+        statusText.textContent = "OFFLINE";
+        feedContainer.innerHTML = `
+          <div class="empty-state">
+            <p>No active agent is running. Customize the settings above and launch your autonomous creator.</p>
+            <button class="btn-submit" onclick="document.getElementById('config-drawer').classList.add('show')">Launch Agent</button>
+          </div>
+        `;
+        return;
+      }
+
+      // 2. Fetch Agent feed
+      try {
+        const feedRes = await fetch(`/api/agent/feed?agentId=${currentAgentId}`);
+        if (!feedRes.ok) {
+          if (feedRes.status === 404) {
+            // Agent ID doesn't exist anymore or is invalid
+            window.location.hash = '';
+            currentAgentId = null;
+            loadAgentAndFeed();
+            return;
+          }
+          throw new Error('Failed to load feed');
+        }
+
+        const feedData = await feedRes.json();
+        
+        // 3. Update status badge and header with live persona info
+        activePersonaSpan.innerHTML = `<strong>${personaName}</strong> <span style="font-size:0.85rem; color:var(--text-secondary); font-family:'Inter'">(${personaDomain})</span>`;
+        statusBadge.className = "status-indicator";
+        statusPulse.className = "pulse";
+        statusText.textContent = "ACTIVE & AUTONOMOUS";
+
+        // 4. Render posts
+        if (!feedData.posts || feedData.posts.length === 0) {
+          feedContainer.innerHTML = `
+            <div class="empty-state">
+              <p>Agent is active but has not published any content yet.</p>
+              <em style="font-size: 0.85rem; color: var(--text-tertiary);">The publishing scheduler runs every 10-15 minutes. Check back soon.</em>
+            </div>
+          `;
+          return;
+        }
+
+        feedContainer.innerHTML = feedData.posts.map(post => `
+          <article class="post-card">
+            <div class="card-meta">
+              <span class="post-id">${post.id}</span>
+              <span class="post-time">${formatTime(post.createdAt)}</span>
+            </div>
+            <div class="post-text">${post.text}</div>
+            
+            ${post.rationale ? `
+              <div class="behind-scenes">
+                <h4>Behind the Scenes — Publishing Rationale</h4>
+                <p>${post.rationale}</p>
+              </div>
+            ` : ''}
+
+            ${post.sources && post.sources.length > 0 ? `
+              <div class="sources-list">
+                ${post.sources.map(src => `
+                  <a href="${src}" target="_blank" class="source-tag">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 5px;">
+                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                    </svg>
+                    ${cleanUrl(src)}
+                  </a>
+                `).join('')}
+              </div>
+            ` : ''}
+          </article>
+        `).join('');
+
+      } catch (err) {
+        feedContainer.innerHTML = `
+          <div class="empty-state" style="border-color: var(--danger);">
+            <p style="color: var(--danger); font-weight: 600;">Connection Error</p>
+            <p>${err.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    // Initialize dashboard
+    async function init() {
+      await loadAgentAndFeed();
+      
+      // Auto-reload feed every 15 seconds
+      refreshInterval = setInterval(async () => {
+        const prevText = refreshStatusSpan.textContent;
+        refreshStatusSpan.textContent = "Updating feed...";
+        await loadAgentAndFeed();
+        setTimeout(() => {
+          refreshStatusSpan.textContent = "Auto-refreshing every 15s...";
+        }, 1000);
+      }, 15000);
+    }
+
+    init();
+  </script>
+</body>
+</html>
