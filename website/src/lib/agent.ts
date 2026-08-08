@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import fallbackDb from '../../db.json';
 
 // Types matching the mock-data structure
 export type Post = {
@@ -246,22 +247,16 @@ export function readDb(): AgentDb {
 
     if (fs.existsSync(DB_FILE)) {
       const data = fs.readFileSync(DB_FILE, 'utf-8');
-      return JSON.parse(data) as AgentDb;
+      const parsed = JSON.parse(data) as AgentDb;
+      if (parsed && parsed.initialized) {
+        return parsed;
+      }
     }
   } catch (err) {
-    console.error("Error reading db.json, returning empty structure", err);
+    console.error("Error reading db.json, returning bundled fallback", err);
   }
-  return {
-    initialized: false,
-    agentId: null,
-    persona: { name: "", domain: "" },
-    posts: [],
-    memories: [],
-    rejected: [],
-    sources: [],
-    activity: [],
-    stats: { postsPublished: 0, topicsRejected: 0, sourcesMonitored: 0, memoryEntries: 0, publishingScore: 92 }
-  };
+
+  return (fallbackDb as unknown) as AgentDb;
 }
 
 function saveToPythonMeta(persona: { name: string, domain: string }, agentId: string | null): void {
